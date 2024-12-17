@@ -12,7 +12,7 @@ def marco(soft, hard=[], solver="ortools", map_solver="ortools", use_symmetries=
     model, soft, assump = make_assump_model(soft, hard)
 
     s = cp.SolverLookup.get(solver, model)
-    assert s.solve(assump=assump) is False, "Model should be UNSAT in order to find a MUS"
+    assert s.solve(assumptions=assump) is False, "Model should be UNSAT in order to find a MUS"
 
     map_solver = cp.SolverLookup.get(map_solver)
     map_solver += cp.sum(assump) >= 0
@@ -22,7 +22,7 @@ def marco(soft, hard=[], solver="ortools", map_solver="ortools", use_symmetries=
         breakid = BreakID(BREAKID_PATH)  # use pb branch
         permutations, matrices = breakid.get_generators(model.constraints, format="opb", subset=assump, pb=31)
         symmetries = permutations + matrices
-        lexleaders = breakid.breakers_from_generators(symmetries, format="opb")
+        lexleaders = breakid.breakers_from_generators(symmetries, format="opb", pb=31)
         map_solver += lexleaders
 
     def _grow_to_mss(seed):
@@ -41,7 +41,7 @@ def marco(soft, hard=[], solver="ortools", map_solver="ortools", use_symmetries=
         while len(to_check):
             test_var = to_check.pop()
             subassump = list(core - {test_var})
-            if s.solve(subassump=subassump) is False:
+            if s.solve(assumptions=subassump) is False:
                 # still unsat, reduce with potential smaller core
                 assert set(s.get_core()) <= set(subassump), "Solver core should be subset of current core"
                 core = set(s.get_core())
@@ -69,11 +69,12 @@ def marco(soft, hard=[], solver="ortools", map_solver="ortools", use_symmetries=
             map_solver += ~cp.all(mus) # exclude super-sets of MUS
             musses.append(mus)
 
+    print(f"Found {len(musses)} musses")
     if use_symmetries:
         # need to unroll to the full set of MUSes
-        return unroll(musses, symmetries)
-    else:
-        return musses
+        musses = unroll(musses, symmetries)
+
+    return [[c for a,c in zip(assump, soft) if a in frozenset(mus)] for mus in musses]
 
 
 
