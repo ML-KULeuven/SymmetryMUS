@@ -229,7 +229,7 @@ class BreakID:
             os.remove(symfile)
         return cpm_permutations, cpm_matrices
 
-    def breakers_from_generators(self, generators, format="dimacs", symfile=None, **kwargs):
+    def breakers_from_generators(self, generators, format="opb", symfile=None, **kwargs):
         """
             Runs BreakID with empty theory and injects stored symmetries.
             Returns set of constraints, either clausal or pb
@@ -237,6 +237,8 @@ class BreakID:
             :param: format: the format to use, should be 'dimacs' or 'opb'
             :param: kwargs: additional keyword arguments to pass to the breakid tool
         """
+        if format != "opb": raise NotImplementedError("TODO: implement parsing of cnf breakers from file")
+
         tmp = tempfile.NamedTemporaryFile().name
         vars = set().union(*[gen.get_variables() for gen in generators])
         self._map = {v : i+1 for i, v in enumerate(natsorted(vars, key=str))}
