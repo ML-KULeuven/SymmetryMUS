@@ -5,7 +5,7 @@ BREAKID_PATH = "/local/usr/bin/breakid/src/BreakID"
 def unroll(subsets, symmetries):
 
     all_subsets = []
-    subsets = list(subsets)
+    subsets = list([frozenset(ss) for ss in subsets])
     while len(subsets):
         ss = subsets.pop(0)
         all_subsets.append(ss)
