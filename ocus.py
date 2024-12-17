@@ -17,7 +17,7 @@ def ocus(soft, hard=[], solver="ortools", hs_solver="ortools", lex_leaders=True,
 
     if lex_leaders is True or generate_symmetric is True:
         breakid = BreakID(BREAKID_PATH)
-        perms, matrices = breakid.get_generators(model.constraints, format="opb", pb=31)
+        perms, matrices = breakid.get_generators(model.constraints, format="opb", pb=31, subset=assump)
         symmetries = perms + matrices
     if lex_leaders is True:
         hs_solver += breakid.breakers_from_generators(symmetries, format="opb", pb=31)
@@ -32,20 +32,20 @@ def ocus(soft, hard=[], solver="ortools", hs_solver="ortools", lex_leaders=True,
         # else, SAT, need to grow
         sat_subset = [a for a,c in zip(assump, soft) if a.value() or c.value()]
         while s.solve(assumptions=sat_subset) is True:
-            subset = [a for a,c in zip(assump, soft) if a.value() or c.value()]
+            corr_subset = [a for a,c in zip(assump, soft) if not a.value() and not c.value()]
             if generate_symmetric is True: # also find symmetric versions of `subset`
-                sat_subset = set(subset)
+                sat_subset = set(sat_subset)
                 for sym in symmetries:
-                    new_corr_subsets = sym.apply_symmetry(subset, exclude=frozenset(sets_to_hit))
+                    new_corr_subsets = sym.apply_symmetry(corr_subset, exclude=frozenset(sets_to_hit))
                     for mcs in new_corr_subsets:
                         hs_solver += cp.any(mcs)  # add mcs to hitting-set solver
                         sets_to_hit.append(mcs)   # keep track of sets to hit
                         sat_subset |= set(mcs)    # extend sat_subset
                 sat_subset = list(sat_subset)
             else:
-                hs_solver += cp.any(subset)
-                sets_to_hit.append(subset)
-                sat_subset.append(subset)
+                hs_solver += cp.any(corr_subset)
+                sets_to_hit.append(corr_subset)
+                sat_subset.extend(corr_subset)
 
     return [c for a,c in zip(assump, soft) if a in frozenset(hitting_set)]
 
