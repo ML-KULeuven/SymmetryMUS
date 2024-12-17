@@ -24,16 +24,16 @@ def deletion_based_mus(soft, hard=[], solver="exact", use_symmetries=True):
         symmetries = permutations + matrices
 
     s = cp.SolverLookup.get(solver, model)
-    assert s.solve(assump=assump) is False, "Model should be UNSAT in order to find a MUS"
+    assert s.solve(assumptions=assump) is False, "Model should be UNSAT in order to find a MUS"
 
     to_check = set(s.get_core())
-    core = set(s.get_core)
+    core = set(s.get_core())
     while len(to_check):
 
         test_var = to_check.pop()
 
         subassump = list(core - {test_var})
-        if s.solve(subassump=subassump) is False:
+        if s.solve(assumptions=subassump) is False:
             # still unsat, reduce with potential smaller core
             assert set(s.get_core()) <= set(subassump), "Solver core should be subset of current core"
             core = set(s.get_core())
