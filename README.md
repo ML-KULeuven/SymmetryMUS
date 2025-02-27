@@ -22,6 +22,7 @@ Algorithms:
 - `deletion.py`: Python implementation of the deletion-based algorithm
 - `ocus.py`: Python implementation of the implicit-hitting-set based algorithm for finding a smallest MUS
 - `marco.py`: Python implementation of the MARCO-algorithm for enumerating MUSes/MCSes
+
 Support-files:
 - `breakid.py`: A Python-wrapper for BreakID
 - `symmetries.py`: Houses the datastructures for storing generators
