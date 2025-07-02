@@ -31,7 +31,8 @@ Support-files:
 ## Running the code
 
 To run  the code, you will need to install the CPMpy library and the BreakID tool.
-**WARNING** make sure to install the BreakdID tool from the `pb_optimization` branch! 
+
+**\*\*MAKE SURE\*\*** to install the BreakdID tool from the `pb_optimization` branch! 
 https://bitbucket.org/krr/breakid/src/pb_optimization/
 
 For efficient solving of symmetric problems, we also recommend to install the PB-solver Exact.
